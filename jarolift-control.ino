@@ -4,6 +4,7 @@
 #include "server.h"
 
 void setup() {
+    startGpio();
     startServer();
 }
 
