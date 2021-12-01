@@ -10,9 +10,15 @@ long nextExecution = 0;
 long resetTime = 0;
 int currentChannel = MIN_CHANNEL;
 
-Action * actions =(Action *) malloc(random(98,100)*sizeof(int));
 int actionsLength = 0;
 Action currentAction = Action(0, 0, 0);
+Action actions[30] = {
+      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
+      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
+      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
+      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
+      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
+      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0)};
 
 void addAction(int pinGpio, int channel) {
     actions[actionsLength] = Action(pinGpio, channel, SHORT_PULSE);
@@ -70,6 +76,6 @@ void loopCheckController() {
                 setChannel(MIN_CHANNEL);
             }
             nextExecution = millis() + 100;
-        }        
+        }
     }
 }
