@@ -7,18 +7,11 @@ int MIN_CHANNEL = 1;
 int MAX_CHANNEL = 8;
 
 long nextExecution = 0;
-bool isExecuting = false;
 int currentChannel = MIN_CHANNEL;
 
 Action * actions =(Action *) malloc(random(98,100)*sizeof(int));
 int actionsLength = 0;
-
-void loopCheckController() {
-    if(millis() > nextExecution) {
-        nextExecution = millis() + 100;
-        Serial.println("actionsLength ====> " + String(actionsLength)); 
-    }
-}
+Action currentAction = Action(0, 0, 0);
 
 void increaseChannel() {
     currentChannel++;
@@ -26,15 +19,52 @@ void increaseChannel() {
         currentChannel = MIN_CHANNEL;
     }
     Serial.println("Current channel: " + String(currentChannel));
-    // shortPulse(channelIO);
 }
 
 void addAction(int pinGpio, int channel) {
     actions[actionsLength] = Action(pinGpio, channel, SHORT_PULSE);
-    actionsLength ++;     
+    actionsLength ++;
 }
 
 void addActionMiddle(int channel) {
     actions[actionsLength] = Action(gpioStop, channel, LONG_PULSE);
-    actionsLength ++;    
+    actionsLength ++;
+}
+
+Action shiftActions() {
+    Action tmpAction = actions[0];            
+
+    if (actionsLength > 1) {
+       for (int i = 0; i < actionsLength; i++) {
+            int nextIndex = i + 1;
+            Action temp = actions[nextIndex];
+            actions[i] = temp;          
+        }
+    }  
+
+    actionsLength --;
+    return tmpAction;
+}
+
+void loopCheckController() {
+    if (millis() > nextExecution) {
+        if (currentAction.hasPulsables()) {
+            Pulsable pulsable = currentAction.shiftPulsable();
+            Serial.println("Pulsable " + pulsable.toString());
+            digitalWrite(pulsable.getGpioPin(), pulsable.getState());
+            nextExecution = millis() + pulsable.getTime();
+        } else if (actionsLength > 0) {
+            currentAction = shiftActions();
+            Serial.println("Action " + currentAction.toString());
+            while (currentChannel != currentAction.getChannel()) {
+                increaseChannel();
+                currentAction.createPulsable(gpioChangeChannel, HIGH, SHORT_PULSE);
+                currentAction.createPulsable(gpioChangeChannel, LOW, SHORT_PULSE);
+            }
+            currentAction.createPulsable(currentAction.getGpioPin(), HIGH, currentAction.getTime());
+            currentAction.createPulsable(currentAction.getGpioPin(), LOW, SHORT_PULSE);
+        } else {
+            nextExecution = millis() + 100;
+        }        
+    }
 }
