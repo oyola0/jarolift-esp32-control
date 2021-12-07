@@ -6,7 +6,7 @@
 #include "controller.h"
 #include "server.h"
 
-IPAddress staticIP(192, 168, 1, 100);
+IPAddress staticIP(192, 168, 1, 200);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
