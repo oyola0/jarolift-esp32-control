@@ -8,6 +8,8 @@ class Pulsable {
     int _time;
 
   public:
+    Pulsable() {}
+
     Pulsable(int gpioPin, int state, int time) {    
       this->_gpioPin = gpioPin;
       this->_state = state;

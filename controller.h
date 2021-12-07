@@ -11,14 +11,8 @@ long resetTime = 0;
 int currentChannel = MIN_CHANNEL;
 
 int actionsLength = 0;
-Action currentAction = Action(0, 0, 0);
-Action actions[30] = {
-      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
-      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
-      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
-      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
-      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),
-      Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0),Action(0,0,0)};
+Action currentAction;
+Action actions[100];
 
 void addAction(int pinGpio, int channel) {
     actions[actionsLength] = Action(pinGpio, channel, SHORT_PULSE);

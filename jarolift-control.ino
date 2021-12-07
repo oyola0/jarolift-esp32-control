@@ -6,6 +6,10 @@
 #include "controller.h"
 #include "server.h"
 
+IPAddress staticIP(192, 168, 1, 100);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+
 void setup() {
     Serial.begin(115200);
 
@@ -20,7 +24,10 @@ void setup() {
         return;
     }
 
-    // Connect to Wi-Fi
+    if (!WiFi.config(staticIP, gateway, subnet)) {
+        Serial.println("Configuration failed.");
+    }
+
     WiFi.begin(WiFiSSID, WiFiPassword);
     while (WiFi.status() != WL_CONNECTED) {
         delay(1000);

@@ -10,12 +10,11 @@ class Action {
     int _channel;    
    
     int pulsablesLength = 0;
-    Pulsable pulsables[18] = {
-      Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),
-      Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),
-      Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0),Pulsable(0,0,0)};
+    Pulsable pulsables[18];
 
   public:
+    Action() {}
+
     Action(int gpioPin, int channel, int time) {    
       this->_gpioPin = gpioPin;
       this->_channel = channel;
