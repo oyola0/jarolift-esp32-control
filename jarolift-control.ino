@@ -1,14 +1,18 @@
-// Import required libraries
+#include <Arduino.h>
+
 #include "WiFi.h"
 #include "SPIFFS.h"
 
 #include "config.h"
 #include "controller.h"
 #include "server.h"
+#include "alexa.h"
 
 IPAddress staticIP(192, 168, 1, 200);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
+IPAddress primaryDNS(80, 58, 61, 250);
+IPAddress secondaryDNS(80, 58, 61, 254);
 
 void setup() {
     Serial.begin(115200);
@@ -24,7 +28,7 @@ void setup() {
         return;
     }
 
-    if (!WiFi.config(staticIP, gateway, subnet)) {
+    if (!WiFi.config(staticIP, gateway, subnet, primaryDNS, secondaryDNS)) {
         Serial.println("Configuration failed.");
     }
 
@@ -37,9 +41,13 @@ void setup() {
     // Print ESP32 Local IP Address
     Serial.println(WiFi.localIP());
 
+    setupSinricPro();
+  
     startServer();
 }
 
 void loop() {
+    loopSinricPro();
+    
     loopCheckController();
 }
