@@ -1,9 +1,9 @@
 #include "Pulsable.h"
 
-#ifndef Action_h
-#define Action_h
+#ifndef Request_h
+#define Request_h
 
-class Action {
+class Request {
   private:
     int _time;
     int _gpioPin;
@@ -13,9 +13,9 @@ class Action {
     Pulsable pulsables[18];
 
   public:
-    Action() {}
+    Request() {}
 
-    Action(int gpioPin, int channel, int time) {    
+    Request(int gpioPin, int channel, int time) {    
       this->_gpioPin = gpioPin;
       this->_channel = channel;
       this->_time = time;      

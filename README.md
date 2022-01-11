@@ -9,7 +9,7 @@ For example we want a `sensorId` parameter in a route rule to match only a integ
 ```cpp
     server.on("^\\/api\\/middle\\/channel\\/([0-9])$", HTTP_GET, [] (AsyncWebServerRequest *request) {
         String channel = request->pathArg(0); 
-        addAction("middle", channel);
+        addRequest("middle", channel);
         request->send(200, "text/plain", "{}");
     });
 ```

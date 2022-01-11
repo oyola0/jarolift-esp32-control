@@ -1,5 +1,5 @@
 #include "config.h"
-#include "Action.h"
+#include "Request.h"
 
 int SHORT_PULSE = 500;
 int LONG_PULSE = 4000;
@@ -10,33 +10,33 @@ long nextExecution = 0;
 long resetTime = 0;
 int currentChannel = MIN_CHANNEL;
 
-int actionsLength = 0;
-Action currentAction;
-Action actions[100];
+int requestLength = 0;
+Request currentRequest;
+Request requests[100];
 
-void addAction(int pinGpio, int channel) {
-    actions[actionsLength] = Action(pinGpio, channel, SHORT_PULSE);
-    actionsLength ++;
+void addRequest(int pinGpio, int channel) {
+    requests[requestLength] = Request(pinGpio, channel, SHORT_PULSE);
+    requestLength ++;
 }
 
-void addActionMiddle(int channel) {
-    actions[actionsLength] = Action(gpioStop, channel, LONG_PULSE);
-    actionsLength ++;
+void addRequestMiddle(int channel) {
+    requests[requestLength] = Request(gpioStop, channel, LONG_PULSE);
+    requestLength ++;
 }
 
-Action shiftActions() {
-    Action tmpAction = actions[0];            
+Request shiftRequests() {
+    Request tmpRequest = requests[0];            
 
-    if (actionsLength > 1) {
-       for (int i = 0; i < actionsLength; i++) {
+    if (requestLength > 1) {
+       for (int i = 0; i < requestLength; i++) {
             int nextIndex = i + 1;
-            Action temp = actions[nextIndex];
-            actions[i] = temp;          
+            Request temp = requests[nextIndex];
+            requests[i] = temp;          
         }
     }  
 
-    actionsLength --;
-    return tmpAction;
+    requestLength --;
+    return tmpRequest;
 }
 
 void setChannel(int channel) {
@@ -46,25 +46,25 @@ void setChannel(int channel) {
             currentChannel = MIN_CHANNEL;
         }
         Serial.println("Current channel: " + String(currentChannel));
-        currentAction.createPulsable(gpioChangeChannel, HIGH, SHORT_PULSE);
-        currentAction.createPulsable(gpioChangeChannel, LOW, SHORT_PULSE);
+        currentRequest.createPulsable(gpioChangeChannel, HIGH, SHORT_PULSE);
+        currentRequest.createPulsable(gpioChangeChannel, LOW, SHORT_PULSE);
     }
 }
 
 void loopCheckController() {
     if (millis() > nextExecution) {
-        if (currentAction.hasPulsables()) {
-            Pulsable pulsable = currentAction.shiftPulsable();
+        if (currentRequest.hasPulsables()) {
+            Pulsable pulsable = currentRequest.shiftPulsable();
             Serial.println("Pulsable " + pulsable.toString());
             digitalWrite(pulsable.getGpioPin(), pulsable.getState());
             nextExecution = millis() + pulsable.getTime();
             resetTime = millis() + 60000;
-        } else if (actionsLength > 0) {
-            currentAction = shiftActions();
-            Serial.println("Action " + currentAction.toString());
-            setChannel(currentAction.getChannel());
-            currentAction.createPulsable(currentAction.getGpioPin(), HIGH, currentAction.getTime());
-            currentAction.createPulsable(currentAction.getGpioPin(), LOW, SHORT_PULSE);
+        } else if (requestLength > 0) {
+            currentRequest = shiftRequests();
+            Serial.println("Request " + currentRequest.toString());
+            setChannel(currentRequest.getChannel());
+            currentRequest.createPulsable(currentRequest.getGpioPin(), HIGH, currentRequest.getTime());
+            currentRequest.createPulsable(currentRequest.getGpioPin(), LOW, SHORT_PULSE);
         } else {
             if (millis() > resetTime) {
                 setChannel(MIN_CHANNEL);

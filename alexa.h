@@ -5,11 +5,11 @@
 bool onBlindGeneric(int &position, int channel) {
     Serial.printf("Channel %s set position to %d\r\n", String(channel), position);
     if (position == -10) {
-        addAction(gpioDown, channel);
+        addRequest(gpioDown, channel);
     } else if (position == 10) {
-        addAction(gpioUp, channel);
+        addRequest(gpioUp, channel);
     } else {
-        addActionMiddle(channel);
+        addRequestMiddle(channel);
     }
     return true;
 }
@@ -24,7 +24,7 @@ bool onBlind2(const String &deviceId, int &position) {
 
 bool onBlindState(bool &state, int channel) {
   Serial.printf("Channel %s turned to %s \r\n", String(channel), state?"on":"off");
-  addAction(gpioStop, channel);
+  addRequest(gpioStop, channel);
   return true; // request handled properly
 }
 
