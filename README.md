@@ -1,5 +1,13 @@
 # jarolift-esp32-control
 
+## Uploading Filesystem Image
+1. Click the PIO icon at the left side bar. The project tasks should open.
+2. Select env:esp32doit-devkit-v1 (it may be slightly different depending on the board you’re using).
+3. Expand the Platform menu.
+4. Select Build Filesystem Image.
+5. Finally, click Upload Filesystem Image.
+
+![Uploading Filesystem Image](https://i2.wp.com/randomnerdtutorials.com/wp-content/uploads/2020/12/Upload-filesystem-image-ESP32-VS-Code-PlatformIO-SPIFFS.jpg)
 
 ### Path variable
 

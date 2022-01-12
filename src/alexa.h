@@ -3,37 +3,37 @@
 #include "config.h"
 
 bool onBlindGeneric(int &position, int channel) {
-    Serial.printf("Channel %s set position to %d\r\n", String(channel), position);
-    if (position == -10) {
-        addRequest(gpioDown, channel);
-    } else if (position == 10) {
-        addRequest(gpioUp, channel);
-    } else {
-        addRequestMiddle(channel);
-    }
-    return true;
+  Serial.printf("Channel %s set position to %d\r\n", String(channel), position);
+  if (position == -10) {
+    addRequest(gpioDown, channel);
+  } else if (position == 10) {
+    addRequest(gpioUp, channel);
+  } else {
+    addRequestMiddle(channel);
+  }
+  return true;
 }
 
 bool onBlind1(const String &deviceId, int &position) {
-    onBlindGeneric(position, 1);
+  return onBlindGeneric(position, 1);
 }
 
 bool onBlind2(const String &deviceId, int &position) {
-    onBlindGeneric(position, 2);
+  return onBlindGeneric(position, 2);
 }
 
 bool onBlindState(bool &state, int channel) {
-  Serial.printf("Channel %s turned to %s \r\n", String(channel), state?"on":"off");
+  Serial.printf("Channel %s turned to %s \r\n", String(channel), state ? "on" : "off");
   addRequest(gpioStop, channel);
   return true; // request handled properly
 }
 
 bool onBlindState1(const String &deviceId, bool &state) {
-    onBlindState(state, 1);
+  return onBlindState(state, 1);
 }
 
 bool onBlindState2(const String &deviceId, bool &state) {
-    onBlindState(state, 2);
+  return onBlindState(state, 2);
 }
 
 void setupSinricPro() {
@@ -55,5 +55,5 @@ void setupSinricPro() {
 }
 
 void loopSinricPro() {
-    SinricPro.handle();
+  SinricPro.handle();
 }
