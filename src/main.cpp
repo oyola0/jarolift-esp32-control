@@ -3,7 +3,7 @@
 #include "SPIFFS.h"
 #include "alexa.h"
 
-IPAddress staticIP(192, 168, 1, 201);
+IPAddress staticIP(192, 168, 1, 200);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(80, 58, 61, 250);
