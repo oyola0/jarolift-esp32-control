@@ -28,7 +28,7 @@ void setup() {
 
   WiFi.begin(WiFiSSID, WiFiPassword);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+    delay(5000);
     Serial.println("Connecting to WiFi...");
   }
 
@@ -38,7 +38,18 @@ void setup() {
   startServer();
 }
 
+long delayToRestart = 0;
+
 void loop() {
+  if (WiFi.status() != WL_CONNECTED) {
+    if (delayToRestart == 0) {
+      Serial.println("Restarting in 90 seconds");
+      delayToRestart = millis() + 90000;
+    } else if (millis() > delayToRestart) {
+      ESP.restart();
+    }
+  }
+
   loopSinricPro();
   
   loopCheckController();
