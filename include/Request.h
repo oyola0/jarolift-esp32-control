@@ -7,8 +7,9 @@ class Request {
   private:
     int _time;
     int _gpioPin;
-    int _channel;    
-   
+    int _channel;
+
+    int _delay = 0;    
     int pulsablesLength = 0;
     Pulsable pulsables[18];
 
@@ -19,6 +20,13 @@ class Request {
       this->_gpioPin = gpioPin;
       this->_channel = channel;
       this->_time = time;      
+    }
+
+    Request(int gpioPin, int channel, int time, int delay) {    
+      this->_gpioPin = gpioPin;
+      this->_channel = channel;
+      this->_time = time;      
+      this->_delay = delay;
     }
 
     void createPulsable(int gpioPin, int state, int time) {
@@ -36,6 +44,14 @@ class Request {
 
     int getChannel() {
       return _channel;
+    }
+
+    int getDelay() {
+      return _delay;
+    }
+
+    void resetDelay() {
+      this->_delay = 0;
     }
 
     bool hasPulsables() {
