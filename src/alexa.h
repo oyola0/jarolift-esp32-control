@@ -4,10 +4,10 @@
 
 bool onRangeValue(int &position, int channel) {
   Serial.printf("Channel %s set position to %d\r\n", String(channel), position);
-  if (position == 0) {
-    addRequest(gpioDown, channel);
-  } else if (position == 100) {
-    addRequest(gpioUp, channel);
+  if (position == 0 || position == -10) {
+    addRequestPosition(0, channel);
+  } else if (position == 100 || position == 10) {
+    addRequestPosition(100, channel);
   } else {
     addRequestPosition(position, channel);
   }
@@ -23,24 +23,10 @@ bool onBlind2(const String &deviceId, int &position) {
   return onRangeValue(position, 2);
 }
 
-bool onAdjustRangeValue(int &positionDelta, int channel) {
-  Serial.printf("Channel %s set positionDelta to %d\r\n", String(channel), String(positionDelta));
-  addRequestByPositionDelta(positionDelta, channel);
-  return true;
-}
-
-bool onBlindDelta1(const String &deviceId, int &positionDelta) {
-  return onAdjustRangeValue(positionDelta, 1);
-}
-
-bool onBlindDelta2(const String &deviceId, int &positionDelta) {
-  return onAdjustRangeValue(positionDelta, 2);
-}
-
 bool onBlindState(bool &state, int channel) {
   Serial.printf("Channel %s turned to %s \r\n", String(channel), state ? "on" : "off");
   addRequest(gpioStop, channel);
-  return true; // request handled properly
+  return true;
 }
 
 bool onBlindState1(const String &deviceId, bool &state) {
@@ -56,12 +42,12 @@ void setupSinricPro() {
   SinricProBlinds &myBlinds1 = SinricPro[BLIND_ID_1];
   myBlinds1.onPowerState(onBlindState1);
   myBlinds1.onRangeValue(onBlind1);
-  myBlinds1.onAdjustRangeValue(onBlindDelta1);
+  myBlinds1.onAdjustRangeValue(onBlind1);
 
   SinricProBlinds &myBlinds2 = SinricPro[BLIND_ID_2];
   myBlinds2.onPowerState(onBlindState2);
   myBlinds2.onRangeValue(onBlind2);
-  myBlinds2.onAdjustRangeValue(onBlindDelta2);
+  myBlinds2.onAdjustRangeValue(onBlind2);
 
   // setup SinricPro
   SinricPro.onConnected([](){ Serial.printf("Connected to SinricPro\r\n"); }); 

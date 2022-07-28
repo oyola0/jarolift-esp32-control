@@ -5,7 +5,7 @@ int SHORT_PULSE = 500;
 int LONG_PULSE = 4000;
 int MIN_CHANNEL = 1;
 int MAX_CHANNEL = 8;
-float MOVE_TIME = 27.5;   // Time to full up
+float MOVE_TIME = 23.0;   // Time to full up
 
 long nextExecution = 0;
 long resetTime = 0;
@@ -36,28 +36,23 @@ void addRequestPosition(int targetPosition, int channel) {
   
   if (targetPosition <= 0) {
     addRequest(gpioDown, channel);
+    blindPositions[channel] = 0;
   } else if (targetPosition >= 100) {
     addRequest(gpioUp, channel);
+    blindPositions[channel] = 100;
   } else if (targetPosition > currentPosition) {
     int positions = targetPosition - currentPosition;
     int delay = (int) (positions * delayPercent * 1000);
+    blindPositions[channel] = targetPosition;
     requests[requestLength] = Request(gpioUp, channel, SHORT_PULSE, delay);
     requestLength ++;
   } else if (targetPosition < currentPosition) {
     int positions = currentPosition - targetPosition;
     int delay = (int) (positions * delayPercent * 1000);
+    blindPositions[channel] = targetPosition;
     requests[requestLength] = Request(gpioDown, channel, SHORT_PULSE, delay);
     requestLength ++;
   }
-}
-
-void addRequestByPositionDelta(int positionDelta, int channel) {
-  int currentPosition = blindPositions[channel];
-  int targetPosition = currentPosition + positionDelta;
-  Serial.println("CurrentPosition 2: " + String(currentPosition));  
-  Serial.println("Delta position: " + String(positionDelta));
-  Serial.println("TargetPosition 2: " + String(targetPosition));  
-  addRequestPosition(targetPosition, channel);
 }
 
 Request shiftRequests() {
