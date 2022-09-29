@@ -25,6 +25,7 @@ void addRequest(int pinGpio, int channel) {
 void addRequestMiddle(int channel) {
   requests[requestLength] = Request(gpioStop, channel, LONG_PULSE);
   requestLength ++;
+  blindPositions[channel] = 30;
 }
 
 void addRequestPosition(int targetPosition, int channel) {
@@ -34,7 +35,9 @@ void addRequestPosition(int targetPosition, int channel) {
   Serial.println("CurrentPosition: " + String(currentPosition));
   Serial.println("TargetPosition: " + String(targetPosition));
   
-  if (targetPosition <= 0) {
+  if (targetPosition == 1) {
+    addRequestMiddle(channel);
+  } else if (targetPosition <= 0) {
     addRequest(gpioDown, channel);
     blindPositions[channel] = 0;
   } else if (targetPosition >= 100) {

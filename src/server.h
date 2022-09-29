@@ -5,17 +5,17 @@
 
 AsyncWebServer server(80);
 
-void responseRequest(AsyncWebServerRequest *request, int pinGpio) {
+void responseRequest(AsyncWebServerRequest *request, int position) {
   Serial.println("API " + request->url() + " called");
 
   int channel = request->pathArg(0).toInt();
 
   if(channel == 0) {
     for (int i = 1; i <= availableChannels; i++) {
-      addRequest(pinGpio, i);        
+      addRequestPosition(position, i);        
     }
   } else {
-    addRequest(pinGpio, channel);
+    addRequestPosition(position, channel);
   }    
 
   request->send(200, "text/plain", "{}");
@@ -38,15 +38,27 @@ void startServer() {
   });
 
   server.on("^\\/api\\/button\\/up\\/channel\\/(0|1|2)$", HTTP_GET, [](AsyncWebServerRequest *request) {
-    responseRequest(request, gpioUp);
+    responseRequest(request, 100);
   });
 
   server.on("^\\/api\\/button\\/stop\\/channel\\/(0|1|2)$", HTTP_GET, [](AsyncWebServerRequest *request) {
-    responseRequest(request, gpioStop);
+    Serial.println("API " + request->url() + " called");
+
+    int channel = request->pathArg(0).toInt();
+
+    if(channel == 0) {
+      for (int i = 1; i <= availableChannels; i++) {
+        addRequest(gpioStop, i);        
+      }
+    } else {
+      addRequest(gpioStop, channel);
+    }    
+
+    request->send(200, "text/plain", "{}");
   });
 
   server.on("^\\/api\\/button\\/down\\/channel\\/(0|1|2)$", HTTP_GET, [](AsyncWebServerRequest *request) {
-    responseRequest(request, gpioDown);        
+    responseRequest(request, 0);        
   });
 
   server.on("^\\/api\\/esp32\\/(.*)$", HTTP_GET, [](AsyncWebServerRequest *request) {
