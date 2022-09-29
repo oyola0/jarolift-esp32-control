@@ -7,7 +7,6 @@ int MIN_CHANNEL = 1;
 int MAX_CHANNEL = 8;
 float MOVE_TIME = 23.0;   // Time to full up
 
-long nextExecution = 0;
 long resetTime = 0;
 int currentChannel = MIN_CHANNEL;
 
@@ -23,14 +22,21 @@ void addRequest(int pinGpio, int channel) {
 }
 
 void addRequestMiddle(int channel) {
+  blindPositions[channel] = 30;
   requests[requestLength] = Request(gpioStop, channel, LONG_PULSE);
   requestLength ++;
-  blindPositions[channel] = 30;
+}
+
+void addRequestWithDelay(int gpioBtn, int channel, int pos, int targetPosition) {
+    float delayPercent = MOVE_TIME / 100;
+    int delay = (int) (pos * delayPercent * 1000);
+    blindPositions[channel] = targetPosition;
+    requests[requestLength] = Request(gpioBtn, channel, SHORT_PULSE, delay);
+    requestLength ++;
 }
 
 void addRequestPosition(int targetPosition, int channel) {
   int currentPosition = blindPositions[channel];
-  float delayPercent = MOVE_TIME / 100;
 
   Serial.println("CurrentPosition: " + String(currentPosition));
   Serial.println("TargetPosition: " + String(targetPosition));
@@ -38,23 +44,17 @@ void addRequestPosition(int targetPosition, int channel) {
   if (targetPosition == 1) {
     addRequestMiddle(channel);
   } else if (targetPosition <= 0) {
-    addRequest(gpioDown, channel);
     blindPositions[channel] = 0;
+    addRequest(gpioDown, channel);
   } else if (targetPosition >= 100) {
-    addRequest(gpioUp, channel);
     blindPositions[channel] = 100;
+    addRequest(gpioUp, channel);
   } else if (targetPosition > currentPosition) {
     int positions = targetPosition - currentPosition;
-    int delay = (int) (positions * delayPercent * 1000);
-    blindPositions[channel] = targetPosition;
-    requests[requestLength] = Request(gpioUp, channel, SHORT_PULSE, delay);
-    requestLength ++;
+    addRequestWithDelay(gpioUp, channel, positions, targetPosition);
   } else if (targetPosition < currentPosition) {
     int positions = currentPosition - targetPosition;
-    int delay = (int) (positions * delayPercent * 1000);
-    blindPositions[channel] = targetPosition;
-    requests[requestLength] = Request(gpioDown, channel, SHORT_PULSE, delay);
-    requestLength ++;
+    addRequestWithDelay(gpioDown, channel, positions, targetPosition);
   }
 }
 
@@ -73,6 +73,32 @@ Request shiftRequests() {
   return tmpRequest;
 }
 
+void pulseButton(int gpioBtn, int time) {
+  String btnName = "stop";
+  if (gpioBtn == gpioUp) {
+    btnName = "up";
+  } else if (gpioBtn == gpioDown) {
+    btnName = "down";
+  } else if (gpioBtn == gpioChangeChannel) {
+    btnName = "change channel";
+  }
+  Serial.println("pulse button: " + btnName + ", During: " + String(time));
+
+  digitalWrite(gpioBtn, HIGH);
+  delay(time);
+  digitalWrite(gpioBtn, LOW);
+  delay(SHORT_PULSE);
+  resetTime = millis() + 60000;
+}
+
+void executeRequest(Request req) {
+  pulseButton(req.getGpioPin(), req.getTime());
+  if (req.getDelay() > 0) {
+    delay(req.getDelay());
+    pulseButton(gpioStop, SHORT_PULSE);
+  }
+}
+
 void setChannel(int channel) {
   while (currentChannel != channel) {
     currentChannel++;
@@ -80,37 +106,41 @@ void setChannel(int channel) {
       currentChannel = MIN_CHANNEL;
     }
     Serial.println("Current channel: " + String(currentChannel));
-    currentRequest.createPulsable(gpioChangeChannel, HIGH, SHORT_PULSE);
-    currentRequest.createPulsable(gpioChangeChannel, LOW, SHORT_PULSE);
+    pulseButton(gpioChangeChannel, SHORT_PULSE);    
   }
 }
 
 void loopCheckController() {
-  if (millis() > nextExecution) {
-    if (currentRequest.hasPulsables()) {
-      Pulsable pulsable = currentRequest.shiftPulsable();
-      Serial.println("Pulsable " + pulsable.toString());
-      digitalWrite(pulsable.getGpioPin(), pulsable.getState());
-      nextExecution = millis() + pulsable.getTime();
-      resetTime = millis() + 60000;
-    } else if (currentRequest.getDelay() > 0) {
-      nextExecution = millis() + currentRequest.getDelay() - SHORT_PULSE;
-      Serial.println("Delay to " + String(currentRequest.getDelay()));
-      currentRequest.createPulsable(gpioStop, HIGH, SHORT_PULSE);
-      currentRequest.createPulsable(gpioStop, LOW, SHORT_PULSE);
-      currentRequest.resetDelay();
-    } else if (requestLength > 0) {
-      currentRequest = shiftRequests();
-      Serial.println("Request " + currentRequest.toString());
-      setChannel(currentRequest.getChannel());
-      currentRequest.createPulsable(currentRequest.getGpioPin(), HIGH, currentRequest.getTime());
-      currentRequest.createPulsable(currentRequest.getGpioPin(), LOW, SHORT_PULSE);
-    } else {
-      if (millis() > resetTime) {
-        setChannel(MIN_CHANNEL);
-      }
-      nextExecution = millis() + 100;
-    }
+  if (requestLength > 0) {
+    currentRequest = shiftRequests();
+    Serial.println("Request " + currentRequest.toString());  
+    setChannel(currentRequest.getChannel());
+    executeRequest(currentRequest);
+  } else {
+    if (millis() > resetTime) {
+      setChannel(MIN_CHANNEL);
+    }    
+  }
+  delay(100);
+}
+
+
+TaskHandle_t TaskRemoteController;
+
+void TaskRemoteControllerCode(void * parameter){
+  for(;;){    
+    loopCheckController();
+    delay(10);
   }
 }
 
+void setupController() {
+    xTaskCreatePinnedToCore(
+      TaskRemoteControllerCode,   /* Task function. */
+      "TaskRemoteController",     /* name of task. */
+      10000,       /* Stack size of task */
+      NULL,        /* parameter of the task */
+      2,           /* priority of the task */
+      &TaskRemoteController,      /* Task handle to keep track of created task */
+      1);
+}

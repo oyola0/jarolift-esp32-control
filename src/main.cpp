@@ -4,14 +4,6 @@
 #include "alexa.h"
 #include "CheckWifiStatus.h"
 
-TaskHandle_t TaskRemoteController;
-
-void TaskRemoteControllerCode(void * parameter){
-  for(;;){    
-    loopCheckController();
-  }
-}
-
 void setup() {
   Serial.begin(115200);
 
@@ -29,20 +21,8 @@ void setup() {
   Serial.println(WiFi.localIP());
   Serial.println(WiFi.getHostname());
 
-  Serial.print("setup() running on core ");
-  Serial.println(xPortGetCoreID());
-
   setupCheckWifiStatus();
-
-  xTaskCreatePinnedToCore(
-                    TaskRemoteControllerCode,   /* Task function. */
-                    "TaskRemoteController",     /* name of task. */
-                    10000,       /* Stack size of task */
-                    NULL,        /* parameter of the task */
-                    2,           /* priority of the task */
-                    &TaskRemoteController,      /* Task handle to keep track of created task */
-                    1);
-
+  setupController();
   setupSinricPro();
   startServer();
 }
