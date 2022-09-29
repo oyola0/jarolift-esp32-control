@@ -2,12 +2,15 @@
 #include "WiFi.h"
 #include "SPIFFS.h"
 #include "alexa.h"
+#include "CheckWifiStatus.h"
 
-IPAddress staticIP(192, 168, 1, 200);
-IPAddress gateway(192, 168, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
-IPAddress primaryDNS(80, 58, 61, 250);
-IPAddress secondaryDNS(80, 58, 61, 254);
+TaskHandle_t TaskRemoteController;
+
+void TaskRemoteControllerCode(void * parameter){
+  for(;;){    
+    loopCheckController();
+  }
+}
 
 void setup() {
   Serial.begin(115200);
@@ -16,15 +19,6 @@ void setup() {
   pinMode(gpioUp, OUTPUT);
   pinMode(gpioStop, OUTPUT);
   pinMode(gpioDown, OUTPUT);
-  
-  if (!SPIFFS.begin(true)) {
-    Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
-  }
-
-  if (!WiFi.config(staticIP, gateway, subnet, primaryDNS, secondaryDNS)) {
-    Serial.println("Configuration failed.");
-  }
 
   WiFi.begin(WiFiSSID, WiFiPassword);
   while (WiFi.status() != WL_CONNECTED) {
@@ -33,24 +27,26 @@ void setup() {
   }
 
   Serial.println(WiFi.localIP());
+  Serial.println(WiFi.getHostname());
+
+  Serial.print("setup() running on core ");
+  Serial.println(xPortGetCoreID());
+
+  setupCheckWifiStatus();
+
+  xTaskCreatePinnedToCore(
+                    TaskRemoteControllerCode,   /* Task function. */
+                    "TaskRemoteController",     /* name of task. */
+                    10000,       /* Stack size of task */
+                    NULL,        /* parameter of the task */
+                    2,           /* priority of the task */
+                    &TaskRemoteController,      /* Task handle to keep track of created task */
+                    1);
 
   setupSinricPro();
   startServer();
 }
 
-long delayToRestart = 0;
-
 void loop() {
-  if (WiFi.status() != WL_CONNECTED) {
-    if (delayToRestart == 0) {
-      Serial.println("Restarting in 90 seconds");
-      delayToRestart = millis() + 90000;
-    } else if (millis() > delayToRestart) {
-      ESP.restart();
-    }
-  }
-
   loopSinricPro();
-  
-  loopCheckController();
 }

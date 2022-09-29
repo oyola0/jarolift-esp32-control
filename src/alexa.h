@@ -4,7 +4,7 @@
 
 bool onRangeValue(int &position, int channel) {
   Serial.printf("Channel %s set position to %d\r\n", String(channel), position);
-  if (position == 0 || position == -10) {
+  if (position <= 0) {
     addRequestPosition(0, channel);
   } else if (position == 100 || position == 10) {
     addRequestPosition(100, channel);
