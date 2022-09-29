@@ -6,7 +6,7 @@ class Request {
     int _time;
     int _gpioPin;
     int _channel;
-    int _delay = 0;    
+    int _targetPos = 0;
 
   public:
     Request() {}
@@ -17,11 +17,9 @@ class Request {
       this->_time = time;      
     }
 
-    Request(int gpioPin, int channel, int time, int delay) {    
-      this->_gpioPin = gpioPin;
+    Request(int channel, int targetPos) {    
       this->_channel = channel;
-      this->_time = time;      
-      this->_delay = delay;
+      this->_targetPos = targetPos;
     }
 
     int getTime() {
@@ -36,12 +34,8 @@ class Request {
       return _channel;
     }
 
-    int getDelay() {
-      return _delay;
-    }
-
-    String toString() {
-      return "PIN=" + String(_gpioPin) + ", TIME=" + String(_time) + ", CHANNEL=" + String(_channel); 
+    int getTargetPos() {
+      return _targetPos;
     }
 };
 
