@@ -50,8 +50,16 @@ void setupSinricPro() {
   myBlinds2.onAdjustRangeValue(onBlind2);
 
   // setup SinricPro
-  SinricPro.onConnected([](){ Serial.printf("Connected to SinricPro\r\n"); }); 
-  SinricPro.onDisconnected([](){ Serial.printf("Disconnected from SinricPro\r\n"); });
+  SinricPro.onConnected([](){ 
+    Serial.println("Connected to SinricPro");
+  });
+
+  SinricPro.onDisconnected([](){ 
+    Serial.println("Disconnected from SinricPro");
+    delay(10000);
+    ESP.restart();
+  });
+
   SinricPro.begin(APP_KEY, APP_SECRET);
 }
 

@@ -143,5 +143,5 @@ void setupController() {
       NULL,        /* parameter of the task */
       2,           /* priority of the task */
       &TaskRemoteController,      /* Task handle to keep track of created task */
-      1);
+      0);
 }
