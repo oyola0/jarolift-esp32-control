@@ -3,42 +3,50 @@
 
 #include "config.h"
 #include "WiFi.h"
+#include "controller.h"
+#include "mqttMessages.h"
 #include <PubSubClient.h>
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 TaskHandle_t TaskMQTT;
 
-String messages[250];
-int messageLength = 0;
+void callback(char *topic, byte *payload, unsigned int length) {
+  String topicStr = String(topic);
+  String channelStr = String((char) payload[0]);
+  int channel = 1;
 
-String shiftMessages() {
-  String tmpMessage = messages[0];            
+  println("Message: " + channelStr + " arrived in topic: " + topicStr);
 
-  if (messageLength > 1) {
-    for (int i = 0; i < messageLength; i++) {
-      int nextIndex = i + 1;
-      String temp = messages[nextIndex];
-      messages[i] = temp;          
-    }
-  }  
+  if (channelStr.equals("1")) {
+    channel = 1;
+  } else if(channelStr.equals("2")) {
+    channel = 2;
+  } else {
+    return;
+  }
 
-  messageLength --;
-  return tmpMessage;
-}
-
-void println(String msg) {
-  messages[messageLength] = msg;
-  messageLength ++;
-  Serial.println(msg);
+  if (topicStr.endsWith("up")) {
+    addRequestPosition(100, channel);
+  } else if (topicStr.endsWith("stop")) {
+    addRequest(gpioStop, channel);
+  } else if (topicStr.endsWith("down")) {
+    addRequestPosition(0, channel);
+  } else {
+    addRequestMiddle(channel);
+  }
 }
 
 void connectMQTTClient() {
    while (!client.connected()) {
     Serial.println("Connecting to MQTT...");
-    if (client.connect("ESP32Client", MQTT_USER, MQTT_PASSWORD))
+    if (client.connect("ESP32Client", MQTT_USER, MQTT_PASSWORD)) {
       Serial.println("MQTT connected");
-    else {
+      client.subscribe("ESP32/jarolift/up");
+      client.subscribe("ESP32/jarolift/stop");
+      client.subscribe("ESP32/jarolift/down");
+      client.subscribe("ESP32/jarolift/middle");
+    } else {
       Serial.print(" MQTT failed with state ");
       Serial.print(client.state());
       delay(2000);
@@ -58,16 +66,17 @@ void TaskMQTTCode(void * parameter){
       int msg_len = msg.length() + 1; 
       char msg_array[msg_len];
       msg.toCharArray(msg_array, msg_len);
-      client.publish("ESP32/jarolift", msg_array);
+      client.publish("ESP32/jarolift/logs", msg_array);
       Serial.println("Published event: " + msg);
     }
 
-    delay(500);
+    delay(100);
   }
 }
 
 void setupMQTT() {
   client.setServer(MQTT_SERVER, MQTT_PORT);
+  client.setCallback(callback);
   connectMQTTClient();
 
   xTaskCreatePinnedToCore(

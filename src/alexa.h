@@ -1,3 +1,6 @@
+#ifndef ALEXA_h
+#define ALEXA_h
+
 #include "SinricPro.h"
 #include "SinricProBlinds.h"
 #include "config.h"
@@ -68,3 +71,5 @@ void setupSinricPro() {
 void loopSinricPro() {
   SinricPro.handle();
 }
+
+#endif

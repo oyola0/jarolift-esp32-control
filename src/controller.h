@@ -1,6 +1,9 @@
+#ifndef CONTROLLER_h
+#define CONTROLLER_h
+
 #include "config.h"
 #include "Request.h"
-#include "mqtt.h"
+#include "mqttMessages.h"
 
 int SHORT_PULSE = 500;
 int LONG_PULSE = 4000;
@@ -114,25 +117,20 @@ void setChannel(int channel) {
   }
 }
 
-void loopCheckController() {
-  if (requestLength > 0) {
-    Request currentRequest = shiftRequests();
-    setChannel(currentRequest.getChannel());
-    executeRequest(currentRequest);
-  } else {
-    if (millis() > resetTime) {
-      setChannel(MIN_CHANNEL);
-    }    
-  }
-  delay(100);
-}
-
-
 TaskHandle_t TaskRemoteController;
 
 void TaskRemoteControllerCode(void * parameter){
-  for(;;){    
-    loopCheckController();
+  for(;;) {    
+    if (requestLength > 0) {
+      Request currentRequest = shiftRequests();
+      setChannel(currentRequest.getChannel());
+      executeRequest(currentRequest);
+    } else {
+      if (millis() > resetTime) {
+        setChannel(MIN_CHANNEL);
+      }    
+    }
+    delay(100);
   }
 }
 
@@ -146,3 +144,5 @@ void setupController() {
       &TaskRemoteController,      /* Task handle to keep track of created task */
       0);
 }
+
+#endif

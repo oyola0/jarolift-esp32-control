@@ -3,7 +3,9 @@
 #include "SPIFFS.h"
 #include "alexa.h"
 #include "CheckWifiStatus.h"
+#include "mqttMessages.h"
 #include "mqtt.h"
+#include "controller.h"
 
 void setup() {
   Serial.begin(115200);
@@ -19,14 +21,13 @@ void setup() {
     println("Connecting to WiFi...");
   }
 
-  println("ESP32 IP: " + WiFi.localIP().toString());
+  println("ESP32 Jarolift IP: " + WiFi.localIP().toString());
   println(WiFi.getHostname());
 
   setupMQTT();
   setupCheckWifiStatus();
   setupController();
   setupSinricPro();
-  startServer();
 }
 
 void loop() {
