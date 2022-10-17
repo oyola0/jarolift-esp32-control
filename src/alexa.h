@@ -4,7 +4,8 @@
 #include "SinricPro.h"
 #include "SinricProBlinds.h"
 #include "config.h"
-#include "mqtt.h"
+#include "controller.h"
+#include "mqttMessages.h"
 
 bool onRangeValue(int &position, int channel) {
   println("Channel " + String(channel) + " set position to " + String(position));

@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "WiFi.h"
-#include "SPIFFS.h"
 #include "alexa.h"
 #include "CheckWifiStatus.h"
 #include "mqttMessages.h"
