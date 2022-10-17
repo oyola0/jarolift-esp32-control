@@ -3,6 +3,7 @@
 #include "SPIFFS.h"
 #include "alexa.h"
 #include "CheckWifiStatus.h"
+#include "mqtt.h"
 
 void setup() {
   Serial.begin(115200);
@@ -15,12 +16,13 @@ void setup() {
   WiFi.begin(WiFiSSID, WiFiPassword);
   while (WiFi.status() != WL_CONNECTED) {
     delay(5000);
-    Serial.println("Connecting to WiFi...");
+    println("Connecting to WiFi...");
   }
 
-  Serial.println(WiFi.localIP());
-  Serial.println(WiFi.getHostname());
+  println("ESP32 IP: " + WiFi.localIP().toString());
+  println(WiFi.getHostname());
 
+  setupMQTT();
   setupCheckWifiStatus();
   setupController();
   setupSinricPro();

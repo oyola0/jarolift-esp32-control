@@ -1,9 +1,11 @@
+#include "mqtt.h"
+
 TaskHandle_t TaskCheckWifiStatus;
 
 void TaskCheckWifiStatusCode(void * parameter){
   for(;;){
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("Restarting in 90 seconds");
+        println("Restarting in 90 seconds");
         delay(90000);
         ESP.restart();      
     }

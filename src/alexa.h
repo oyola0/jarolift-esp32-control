@@ -1,9 +1,10 @@
 #include "SinricPro.h"
 #include "SinricProBlinds.h"
 #include "config.h"
+#include "mqtt.h"
 
 bool onRangeValue(int &position, int channel) {
-  Serial.printf("Channel %s set position to %d\r\n", String(channel), position);
+  println("Channel " + String(channel) + " set position to " + String(position));
   if (position <= 0) {
     addRequestPosition(0, channel);
   } else if (position == 100 || position == 10) {
@@ -24,7 +25,8 @@ bool onBlind2(const String &deviceId, int &position) {
 }
 
 bool onBlindState(bool &state, int channel) {
-  Serial.printf("Channel %s turned to %s \r\n", String(channel), state ? "on" : "off");
+  String value = state ? "ON" : "OFF";
+  println("Channel " + String(channel) + " turned to " + value);
   addRequest(gpioStop, channel);
   return true;
 }
@@ -51,11 +53,11 @@ void setupSinricPro() {
 
   // setup SinricPro
   SinricPro.onConnected([](){ 
-    Serial.println("Connected to SinricPro");
+    println("Connected to SinricPro");
   });
 
   SinricPro.onDisconnected([](){ 
-    Serial.println("Disconnected from SinricPro");
+    println("Disconnected from SinricPro");
     delay(10000);
     ESP.restart();
   });

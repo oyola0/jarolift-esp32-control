@@ -1,5 +1,6 @@
 #include "config.h"
 #include "Request.h"
+#include "mqtt.h"
 
 int SHORT_PULSE = 500;
 int LONG_PULSE = 4000;
@@ -65,7 +66,7 @@ void pulseButton(int gpioBtn, int time) {
   } else if (gpioBtn == gpioChangeChannel) {
     btnName = "change channel";
   }
-  Serial.println("pulse button: " + btnName + ", During: " + String(time));
+  println("pulse button: " + btnName + ", During: " + String(time));
 
   digitalWrite(gpioBtn, HIGH);
   delay(time);
@@ -83,7 +84,7 @@ void executeRequest(Request req) {
     int positions = 0;
     int channel = req.getChannel();
     int currentPosition = blindPositions[channel];
-    float speed = 0.75;
+    float speed = 0.95;
 
     if (targetPosition > currentPosition) {
       positions = targetPosition - currentPosition;
@@ -108,7 +109,7 @@ void setChannel(int channel) {
     if (currentChannel > MAX_CHANNEL) {
       currentChannel = MIN_CHANNEL;
     }
-    Serial.println("Current channel: " + String(currentChannel));
+    println("Current channel: " + String(currentChannel));
     pulseButton(gpioChangeChannel, SHORT_PULSE);    
   }
 }
