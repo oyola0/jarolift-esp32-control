@@ -69,7 +69,7 @@ void pulseButton(int gpioBtn, int time) {
   } else if (gpioBtn == gpioChangeChannel) {
     btnName = "change channel";
   }
-  println("pulse button: " + btnName + ", During: " + String(time));
+  println("DEBUG: pulse button: " + btnName + ", During: " + String(time));
 
   digitalWrite(gpioBtn, HIGH);
   delay(time);
@@ -112,7 +112,7 @@ void setChannel(int channel) {
     if (currentChannel > MAX_CHANNEL) {
       currentChannel = MIN_CHANNEL;
     }
-    println("Current channel: " + String(currentChannel));
+    println("DEBUG: Current channel: " + String(currentChannel));
     pulseButton(gpioChangeChannel, SHORT_PULSE);    
   }
 }

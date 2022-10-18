@@ -8,7 +8,7 @@
 #include "mqttMessages.h"
 
 bool onRangeValue(int &position, int channel) {
-  println("Channel " + String(channel) + " set position to " + String(position));
+  println("DEBUG: Channel " + String(channel) + " set position to " + String(position));
   if (position <= 0) {
     addRequestPosition(0, channel);
   } else if (position == 100 || position == 10) {
@@ -30,7 +30,7 @@ bool onBlind2(const String &deviceId, int &position) {
 
 bool onBlindState(bool &state, int channel) {
   String value = state ? "ON" : "OFF";
-  println("Channel " + String(channel) + " turned to " + value);
+  println("DEBUG: Channel " + String(channel) + " turned to " + value);
   addRequest(gpioStop, channel);
   return true;
 }
@@ -61,7 +61,7 @@ void setupSinricPro() {
   });
 
   SinricPro.onDisconnected([](){ 
-    println("Disconnected from SinricPro");
+    println("ERROR: Disconnected from SinricPro");
     delay(10000);
     ESP.restart();
   });

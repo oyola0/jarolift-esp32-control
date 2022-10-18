@@ -16,7 +16,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   String channelStr = String((char) payload[0]);
   int channel = 1;
 
-  println("Message: " + channelStr + " arrived in topic: " + topicStr);
+  println("DEBUG: Message: " + channelStr + " arrived in topic: " + topicStr);
 
   if (channelStr.equals("1")) {
     channel = 1;
@@ -39,17 +39,16 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
 void connectMQTTClient() {
    while (!client.connected()) {
-    Serial.println("Connecting to MQTT...");
+    println("Connecting to MQTT...");
     if (client.connect("ESP32Client", MQTT_USER, MQTT_PASSWORD)) {
-      Serial.println("MQTT connected");
+      println("MQTT connected");
       client.subscribe("ESP32/jarolift/up");
       client.subscribe("ESP32/jarolift/stop");
       client.subscribe("ESP32/jarolift/down");
       client.subscribe("ESP32/jarolift/middle");
     } else {
-      Serial.print(" MQTT failed with state ");
-      Serial.print(client.state());
-      delay(2000);
+      println("ERROR: MQTT failed with state: " + String(client.state()));
+      delay(5000);
     }
   }
 }
@@ -61,16 +60,17 @@ void TaskMQTTCode(void * parameter){
     }
     client.loop();
 
-    if (messageLength > 0) {
+    while (messageLength > 0) {
       String msg = shiftMessages();
       int msg_len = msg.length() + 1; 
       char msg_array[msg_len];
       msg.toCharArray(msg_array, msg_len);
       client.publish("ESP32/jarolift/logs", msg_array);
       Serial.println("Published event: " + msg);
+      delay(10);
     }
 
-    delay(100);
+    delay(1000);
   }
 }
 
