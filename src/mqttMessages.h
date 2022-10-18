@@ -1,7 +1,7 @@
 #ifndef MQTT_MESSAGES_h
 #define MQTT_MESSAGES_h
 
-String messages[250];
+String messages[1000];
 int messageLength = 0;
 
 String shiftMessages() {
