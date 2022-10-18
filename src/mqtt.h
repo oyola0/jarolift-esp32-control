@@ -16,7 +16,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   String channelStr = String((char) payload[0]);
   int channel = 1;
 
-  println("DEBUG: Message: " + channelStr + " arrived in topic: " + topicStr);
+  println("DEBUG: [mqtt.h] Message: " + channelStr + " arrived in topic: " + topicStr);
 
   if (channelStr.equals("1")) {
     channel = 1;
@@ -39,15 +39,15 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
 void connectMQTTClient() {
    while (!client.connected()) {
-    println("Connecting to MQTT...");
+    println("[mqtt.h] Connecting to MQTT...");
     if (client.connect("ESP32Client", MQTT_USER, MQTT_PASSWORD)) {
-      println("MQTT connected");
+      println("[mqtt.h] MQTT connected");
       client.subscribe("ESP32/jarolift/up");
       client.subscribe("ESP32/jarolift/stop");
       client.subscribe("ESP32/jarolift/down");
       client.subscribe("ESP32/jarolift/middle");
     } else {
-      println("ERROR: MQTT failed with state: " + String(client.state()));
+      println("ERROR: [mqtt.h] MQTT failed with state: " + String(client.state()));
       delay(5000);
     }
   }

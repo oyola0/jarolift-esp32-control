@@ -7,7 +7,7 @@ TaskHandle_t TaskWifiConnection;
 void TaskWifiConnectionCode(void * parameter){
   for(;;){
     if (WiFi.status() != WL_CONNECTED) {
-        println("ERROR: Reconnecting to WiFi in 20 seconds...");
+        println("ERROR: [WifiConnection.h] Reconnecting to WiFi in 20 seconds...");
         delay(20000);
         WiFi.disconnect();
         WiFi.reconnect();  
@@ -20,10 +20,10 @@ void setupWifiConnection() {
   WiFi.begin(WiFiSSID, WiFiPassword);
   while (WiFi.status() != WL_CONNECTED) {
     delay(5000);
-    println("Connecting to WiFi...");
+    println("[WifiConnection.h] Connecting to WiFi...");
   }
 
-  println("ESP32 Jarolift IP: " + WiFi.localIP().toString());
+  println("[WifiConnection.h] ESP32 Jarolift IP: " + WiFi.localIP().toString());
 
   xTaskCreatePinnedToCore(
     TaskWifiConnectionCode,
