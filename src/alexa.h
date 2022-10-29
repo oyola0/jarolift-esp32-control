@@ -62,8 +62,8 @@ void setupSinricPro() {
 
   SinricPro.onDisconnected([](){ 
     println("ERROR: [alexa.h] Disconnected from SinricPro");
-    delay(10000);
-    ESP.restart();
+    // delay(10000);
+    // ESP.restart();
   });
 
   SinricPro.begin(APP_KEY, APP_SECRET);

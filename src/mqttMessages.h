@@ -20,6 +20,10 @@ String shiftMessages() {
 }
 
 void println(String msg) {
+  if (messageLength >= 999) {
+    shiftMessages();
+  }
+
   messages[messageLength] = msg;
   messageLength ++;
   Serial.println(msg);

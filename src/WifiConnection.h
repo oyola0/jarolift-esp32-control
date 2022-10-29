@@ -32,5 +32,5 @@ void setupWifiConnection() {
     NULL,
     1,
     &TaskWifiConnection,
-    1); 
+    0); 
 }
