@@ -48,7 +48,7 @@ void connectMQTTClient() {
       client.subscribe("ESP32/jarolift/middle");
     } else {
       println("ERROR: [mqtt.h] MQTT failed with state: " + String(client.state()));
-      delay(10000);
+      delay(20000);
     }
   }
 }
