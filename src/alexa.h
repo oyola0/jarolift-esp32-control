@@ -9,12 +9,12 @@
 
 bool onRangeValue(int &position, int channel) {
   println("DEBUG: [alexa.h] Channel " + String(channel) + " set position to " + String(position));
-  if (position <= 0) {
+  if (position == -10) {
     addRequestPosition(0, channel);
   } else if (position == 100 || position == 10) {
     addRequestPosition(100, channel);
   } else {
-    addRequestPosition(position, channel);
+    addRequestPosition(abs(position), channel);
   }
   
   return true;
@@ -62,8 +62,6 @@ void setupSinricPro() {
 
   SinricPro.onDisconnected([](){ 
     println("ERROR: [alexa.h] Disconnected from SinricPro");
-    // delay(10000);
-    // ESP.restart();
   });
 
   SinricPro.begin(APP_KEY, APP_SECRET);

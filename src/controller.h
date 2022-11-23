@@ -140,7 +140,7 @@ void setupController() {
       "TaskRemoteController",     /* name of task. */
       10000,       /* Stack size of task */
       NULL,        /* parameter of the task */
-      2,           /* priority of the task */
+      3,           /* priority of the task */
       &TaskRemoteController,      /* Task handle to keep track of created task */
       0);
 }

@@ -40,7 +40,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
 void connectMQTTClient() {
    while (!client.connected()) {
     println("[mqtt.h] Connecting to MQTT...");
-    if (client.connect("ESP32Client", MQTT_USER, MQTT_PASSWORD)) {
+    if (client.connect("ESP32_Jarolift_Client", MQTT_USER, MQTT_PASSWORD)) {
       println("[mqtt.h] MQTT connected");
       client.subscribe("ESP32/jarolift/up");
       client.subscribe("ESP32/jarolift/stop");
@@ -48,7 +48,7 @@ void connectMQTTClient() {
       client.subscribe("ESP32/jarolift/middle");
     } else {
       println("ERROR: [mqtt.h] MQTT failed with state: " + String(client.state()));
-      delay(20000);
+      delay(10000);
     }
   }
 }
@@ -84,7 +84,7 @@ void setupMQTT() {
     "TaskMQTT",
     10000,
     NULL,
-    1,
+    2,
     &TaskMQTT,
     0); 
 }
