@@ -31,6 +31,8 @@ void addRequestMiddle(int channel) {
 }
 
 void addRequestPosition(int targetPosition, int channel) {
+  println("DEBUG: [controller.h] Channel: " + String(channel) + ", targetPosition: " + String(targetPosition));
+
   if (targetPosition == 1) {
     addRequestMiddle(channel);
   } else if (targetPosition <= 0) {
