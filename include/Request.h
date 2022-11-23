@@ -1,5 +1,3 @@
-#include "Pulsable.h"
-
 #ifndef Request_h
 #define Request_h
 
@@ -7,10 +5,8 @@ class Request {
   private:
     int _time;
     int _gpioPin;
-    int _channel;    
-   
-    int pulsablesLength = 0;
-    Pulsable pulsables[18];
+    int _channel;
+    int _targetPos = 0;
 
   public:
     Request() {}
@@ -21,9 +17,9 @@ class Request {
       this->_time = time;      
     }
 
-    void createPulsable(int gpioPin, int state, int time) {
-        pulsables[pulsablesLength] = Pulsable(gpioPin, state, time);
-        pulsablesLength ++;
+    Request(int channel, int targetPos) {    
+      this->_channel = channel;
+      this->_targetPos = targetPos;
     }
 
     int getTime() {
@@ -38,27 +34,8 @@ class Request {
       return _channel;
     }
 
-    bool hasPulsables() {
-      return pulsablesLength > 0;
-    }
-
-    Pulsable shiftPulsable() {
-      Pulsable tmpPulsable = pulsables[0];            
-
-      if (pulsablesLength > 1) {
-        for (int i = 0; i < pulsablesLength; i++) {
-              int nextIndex = i + 1;
-              Pulsable temp = pulsables[nextIndex];
-              pulsables[i] = temp;
-          }
-      }  
-
-      pulsablesLength --;
-      return tmpPulsable;
-    }
-
-    String toString() {
-      return "PIN=" + String(_gpioPin) + ", TIME=" + String(_time) + ", CHANNEL=" + String(_channel); 
+    int getTargetPos() {
+      return _targetPos;
     }
 };
 

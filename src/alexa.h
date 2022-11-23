@@ -1,31 +1,38 @@
+#ifndef ALEXA_h
+#define ALEXA_h
+
 #include "SinricPro.h"
 #include "SinricProBlinds.h"
 #include "config.h"
+#include "controller.h"
+#include "mqttMessages.h"
 
-bool onBlindGeneric(int &position, int channel) {
-  Serial.printf("Channel %s set position to %d\r\n", String(channel), position);
+bool onRangeValue(int &position, int channel) {
+  println("DEBUG: [alexa.h] Channel " + String(channel) + " set position to " + String(position));
   if (position == -10) {
-    addRequest(gpioDown, channel);
-  } else if (position == 10) {
-    addRequest(gpioUp, channel);
+    addRequestPosition(0, channel);
+  } else if (position == 100 || position == 10) {
+    addRequestPosition(100, channel);
   } else {
-    addRequestMiddle(channel);
+    addRequestPosition(abs(position), channel);
   }
+  
   return true;
 }
 
 bool onBlind1(const String &deviceId, int &position) {
-  return onBlindGeneric(position, 1);
+  return onRangeValue(position, 1);
 }
 
 bool onBlind2(const String &deviceId, int &position) {
-  return onBlindGeneric(position, 2);
+  return onRangeValue(position, 2);
 }
 
 bool onBlindState(bool &state, int channel) {
-  Serial.printf("Channel %s turned to %s \r\n", String(channel), state ? "on" : "off");
+  String value = state ? "ON" : "OFF";
+  println("DEBUG: [alexa.h] Channel " + String(channel) + " turned to " + value);
   addRequest(gpioStop, channel);
-  return true; // request handled properly
+  return true;
 }
 
 bool onBlindState1(const String &deviceId, bool &state) {
@@ -49,11 +56,19 @@ void setupSinricPro() {
   myBlinds2.onAdjustRangeValue(onBlind2);
 
   // setup SinricPro
-  SinricPro.onConnected([](){ Serial.printf("Connected to SinricPro\r\n"); }); 
-  SinricPro.onDisconnected([](){ Serial.printf("Disconnected from SinricPro\r\n"); });
+  SinricPro.onConnected([](){ 
+    println("[alexa.h] Connected to SinricPro");
+  });
+
+  SinricPro.onDisconnected([](){ 
+    println("ERROR: [alexa.h] Disconnected from SinricPro");
+  });
+
   SinricPro.begin(APP_KEY, APP_SECRET);
 }
 
 void loopSinricPro() {
   SinricPro.handle();
 }
+
+#endif
