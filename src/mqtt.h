@@ -10,6 +10,7 @@
 WiFiClient espClient;
 PubSubClient client(espClient);
 TaskHandle_t TaskMQTT;
+String ClientName = "ESP32_Jarolift_" + String(esp_random());
 
 void callback(char *topic, byte *payload, unsigned int length) {
   String topicStr = String(topic);
@@ -39,9 +40,13 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
 void connectMQTTClient() {
    while (!client.connected()) {
+    int clientName_len = ClientName.length() + 1; 
+    char clientName_array[clientName_len];
+    ClientName.toCharArray(clientName_array, clientName_len);
+
     println("[mqtt.h] Connecting to MQTT...");
-    if (client.connect("ESP32_Jarolift_Client", MQTT_USER, MQTT_PASSWORD)) {
-      println("[mqtt.h] MQTT connected");
+    if (client.connect(clientName_array, MQTT_USER, MQTT_PASSWORD)) {
+      println("[mqtt.h] MQTT Client (" + ClientName + ") Connected");
       client.subscribe("ESP32/jarolift/up");
       client.subscribe("ESP32/jarolift/stop");
       client.subscribe("ESP32/jarolift/down");
@@ -56,8 +61,11 @@ void connectMQTTClient() {
 void TaskMQTTCode(void * parameter){
   for(;;){
     if (!client.connected()) {
+      println("ERROR: [mqtt.h] MQTT Client (" + ClientName + ") Disconnected");
+      client.disconnect();
       connectMQTTClient();
     }
+
     client.loop();
 
     while (messageLength > 0) {
@@ -70,7 +78,7 @@ void TaskMQTTCode(void * parameter){
       delay(10);
     }
 
-    delay(1000);
+    delay(100);
   }
 }
 
