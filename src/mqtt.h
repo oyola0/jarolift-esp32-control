@@ -5,6 +5,7 @@
 #include "WiFi.h"
 #include "controller.h"
 #include "mqttMessages.h"
+#include "Message.h"
 #include <PubSubClient.h>
 
 WiFiClient espClient;
@@ -17,7 +18,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   String channelStr = String((char) payload[0]);
   int channel = 1;
 
-  println("DEBUG: [mqtt.h] Message: " + channelStr + " arrived in topic: " + topicStr);
+  println_debug("[mqtt.h] Message: " + channelStr + " arrived in topic: " + topicStr);
 
   if (channelStr.equals("1")) {
     channel = 1;
@@ -52,7 +53,7 @@ void connectMQTTClient() {
       client.subscribe("ESP32/jarolift/down");
       client.subscribe("ESP32/jarolift/middle");
     } else {
-      println("ERROR: [mqtt.h] MQTT failed with state: " + String(client.state()));
+      println_error("[mqtt.h] MQTT failed with state: " + String(client.state()));
       delay(10000);
     }
   }
@@ -61,7 +62,7 @@ void connectMQTTClient() {
 void TaskMQTTCode(void * parameter){
   for(;;){
     if (!client.connected()) {
-      println("ERROR: [mqtt.h] MQTT Client (" + ClientName + ") Disconnected");
+      println_error("[mqtt.h] MQTT Client (" + ClientName + ") Disconnected");
       client.disconnect();
       connectMQTTClient();
     }
@@ -69,16 +70,17 @@ void TaskMQTTCode(void * parameter){
     client.loop();
 
     while (messageLength > 0) {
-      String msg = shiftMessages();
+      Message message = shiftMessages();
+      String msg = message.getJSON();
       int msg_len = msg.length() + 1; 
       char msg_array[msg_len];
       msg.toCharArray(msg_array, msg_len);
       client.publish("ESP32/jarolift/logs", msg_array);
-      Serial.println("Published event: " + msg);
+      Serial.println("Published event: " + msg +  "");
       delay(10);
     }
 
-    delay(100);
+    delay(10);
   }
 }
 

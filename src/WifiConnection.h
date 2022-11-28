@@ -7,7 +7,7 @@ TaskHandle_t TaskWifiConnection;
 void TaskWifiConnectionCode(void * parameter){
   for(;;){
     if (WiFi.status() != WL_CONNECTED) {
-        println("ERROR: [WifiConnection.h] Reconnecting to WiFi in 10 seconds...");
+        println_error("[WifiConnection.h] Reconnecting to WiFi in 10 seconds...");
         delay(10000);
         WiFi.disconnect();
         WiFi.reconnect();  

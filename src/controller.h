@@ -31,7 +31,7 @@ void addRequestMiddle(int channel) {
 }
 
 void addRequestPosition(int targetPosition, int channel) {
-  println("DEBUG: [controller.h] Channel: " + String(channel) + ", targetPosition: " + String(targetPosition));
+  println_debug("[controller.h] Channel: " + String(channel) + ", targetPosition: " + String(targetPosition));
 
   if (targetPosition == 1) {
     addRequestMiddle(channel);
@@ -71,7 +71,7 @@ void pulseButton(int gpioBtn, int time) {
   } else if (gpioBtn == gpioChangeChannel) {
     btnName = "change channel";
   }
-  println("DEBUG: [controller.h] pulse button: " + btnName + ", During: " + String(time));
+  println_debug("[controller.h] pulse button: " + btnName + ", During: " + String(time));
 
   digitalWrite(gpioBtn, HIGH);
   delay(time);
@@ -114,7 +114,7 @@ void setChannel(int channel) {
     if (currentChannel > MAX_CHANNEL) {
       currentChannel = MIN_CHANNEL;
     }
-    println("DEBUG: [controller.h] Current channel: " + String(currentChannel));
+    println_debug("[controller.h] Current channel: " + String(currentChannel));
     pulseButton(gpioChangeChannel, SHORT_PULSE);    
   }
 }

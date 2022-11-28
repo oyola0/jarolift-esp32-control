@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "WifiConnection.h"
+#include "mqttMessages.h"
 #include "mqtt.h"
 #include "alexa.h"
 #include "controller.h"
@@ -12,6 +13,7 @@ void setup() {
   pinMode(gpioStop, OUTPUT);
   pinMode(gpioDown, OUTPUT);
   
+  setupMQTTMessages();
   setupWifiConnection();
   setupMQTT();  
   setupController();

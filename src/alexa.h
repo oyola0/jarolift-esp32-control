@@ -8,7 +8,7 @@
 #include "mqttMessages.h"
 
 bool onRangeValue(int &position, int channel) {
-  println("DEBUG: [alexa.h] Channel " + String(channel) + " set position to " + String(position));
+  println_debug("[alexa.h] Channel " + String(channel) + " set position to " + String(position));
   if (position == -10) {
     addRequestPosition(0, channel);
   } else if (position == 100 || position == 10) {
@@ -30,7 +30,7 @@ bool onBlind2(const String &deviceId, int &position) {
 
 bool onBlindState(bool &state, int channel) {
   String value = state ? "ON" : "OFF";
-  println("DEBUG: [alexa.h] Channel " + String(channel) + " turned to " + value);
+  println_debug("[alexa.h] Channel " + String(channel) + " turned to " + value);
   addRequest(gpioStop, channel);
   return true;
 }
@@ -61,13 +61,14 @@ void setupSinricPro() {
   });
 
   SinricPro.onDisconnected([](){ 
-    println("ERROR: [alexa.h] Disconnected from SinricPro");
+    println_error("[alexa.h] Disconnected from SinricPro");
   });
 
   SinricPro.begin(APP_KEY, APP_SECRET);
 }
 
 void loopSinricPro() {
+  setTimestamp(SinricPro.getTimestamp());
   SinricPro.handle();
 }
 
