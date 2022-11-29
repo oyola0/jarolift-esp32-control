@@ -71,7 +71,7 @@ void println(String msg) {
 
 void setTimestamp(long new_timestamp) {
   if (last_timestamp_secs != new_timestamp) {
-    println_debug("[mqttMessages.h] Updating timestamp, old: " + String(last_timestamp_secs) + " new: " + String(new_timestamp) + "");
+    println_debug("[mqttMessages.h] Update timestamp, estimated: " + String(current_timestamp_secs) + " receipt: " + String(new_timestamp) + "");
     last_timestamp_secs = new_timestamp;
     current_timestamp_secs = new_timestamp;
   }
