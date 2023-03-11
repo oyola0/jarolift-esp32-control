@@ -87,7 +87,7 @@ void TaskMQTTCode(void * parameter){
 void setupMQTT() {
   client.setServer(MQTT_SERVER, MQTT_PORT);
   client.setCallback(callback);
-  connectMQTTClient();
+  // connectMQTTClient();
 
   xTaskCreatePinnedToCore(
     TaskMQTTCode,
